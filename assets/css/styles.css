@@ -617,7 +617,10 @@ a {
     height: 28px;
     background-color: #f9f9f9;
     border-radius: 5px;
-    margin-right: 16px;
+}
+
+.footer .social-link + .social-link {
+    margin-left: 16px;
 }
 
 .footer .social-link:hover {
