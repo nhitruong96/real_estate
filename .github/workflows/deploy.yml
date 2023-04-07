@@ -5,7 +5,7 @@ name: Deploy to ECR
 on:
   push:
     branches: 
-     - 'STOP-DEPLOY'
+     - 'main'
 
 jobs:
   build:
