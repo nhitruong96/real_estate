@@ -5,7 +5,7 @@ name: Deploy to ECR
 on:
   push:
     branches: 
-     - 'main'
+     - 'STOP-DEPLOY'
 
 jobs:
   build:
@@ -30,8 +30,8 @@ jobs:
      - name: Build, tag, and push image to Amazon ECR
        env:
          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-         ECR_REPOSITORY: booking-movie-ticket
-         IMAGE_TAG: booking-movie-ticket-image-${{github.run_number}}
+         ECR_REPOSITORY: real-estate
+         IMAGE_TAG: real-estate-${{github.run_number}}
        run: |
          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -42,4 +42,4 @@ jobs:
          url: 'https://thisper.levantine.io/build'
          method: 'POST'
          customHeaders: '{"Content-Type": "application/json"}'
-         data: '{"job_id": "Deploy-booking-movie-ticket", "auth_key": "${{ secrets.jenkins_token }}"}'
+         data: '{"job_id": "deploy_real-estate", "auth_key": "${{ secrets.jenkins_token }}"}'
