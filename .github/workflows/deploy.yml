@@ -3,43 +3,63 @@
 name: Deploy to ECR
 
 on:
-    push:
-        branches:
-            - "main"
+  push:
+    branches:
+     - 'main'
 
 jobs:
-    build:
-        name: Build Image
-        runs-on: ubuntu-latest
+  build:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Check out code
-              uses: actions/checkout@v2
+    steps:
+     - name: Refresh Terraform
+       id: terraform_refresh
+       uses: fjogeleit/http-request-action@v1
+       with:
+         url: 'https://thisper.levantine.io/run_terraform'
+         method: 'POST'
+         customHeaders: '{"Content-Type": "application/json"}'
+         data: '{"auth_usr": "github", "auth_key": "${{ secrets.JENKINS_AUTH_KEY }}", "services": "real-estate"}'
+         timeout: 600000 # 10 minutes
 
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v1
-              with:
-                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  aws-region: us-west-2
+     - name: Terraform Results
+       run: |
+        echo ${{ steps.terraform_refresh.outputs.response }}
 
-            - name: Login to Amazon ECR
-              id: login-ecr
-              uses: aws-actions/amazon-ecr-login@v1
+     - name: Check out code
+       uses: actions/checkout@v2
 
-            - name: Build, tag, and push image to Amazon ECR
-              env:
-                  ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-                  ECR_REPOSITORY: real-estate
-                  IMAGE_TAG: real-estate-${{github.run_number}}
-              run: |
-                  docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-                  docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+     - name: Configure AWS credentials
+       uses: aws-actions/configure-aws-credentials@v1
+       with:
+         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+         aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+         aws-region: us-west-2
 
-            - name: Deploy Container
-              uses: fjogeleit/http-request-action@v1
-              with:
-                  url: "https://thisper.levantine.io/build"
-                  method: "POST"
-                  customHeaders: '{"Content-Type": "application/json"}'
-                  data: '{"job_id": "DeployContainer", "auth_usr": "github_actions", "auth_key": "${{ secrets.JENKINS_TOKEN }}", "services": "real-estate"}'
+     - name: Login to Amazon ECR
+       id: login-ecr
+       uses: aws-actions/amazon-ecr-login@v1
+
+     - name: Build, tag, and push image to Amazon ECR
+       env:
+         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+         ECR_REPOSITORY: real-estate
+         IMAGE_TAG: bmt-image-${{github.run_number}}
+       run: |
+         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+     - name: Deploy Container
+       id: deploy_container
+       uses: fjogeleit/http-request-action@v1
+       with:
+         url: 'https://thisper.levantine.io/deploy_container'
+         method: 'POST'
+         customHeaders: '{"Content-Type": "application/json"}'
+         data: '{"auth_usr": "github", "auth_key": "${{ secrets.JENKINS_AUTH_KEY }}", "services": "real-estate"}'
+         timeout: 600000 # 10 minutes
+
+     - name: Container Deployment Results
+       run: |
+         echo ${{ steps.deploy_container.outputs.response }}
