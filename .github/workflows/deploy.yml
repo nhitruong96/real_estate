@@ -1,5 +1,9 @@
 # https://medium.com/devops-techable/build-docker-image-with-github-actions-and-push-it-to-amazon-ecr-d4e739472284
 
+# Although this template is deployed in multiple repos, it is primarily maintained in the Thisper repository.
+# https://github.com/Levantine-1/thisper
+# And then it is copied to other github repositories as needed in the github actions workflow directory.
+
 name: Deploy to ECR
 
 on:
@@ -25,8 +29,7 @@ jobs:
                   JENKINS_AUTH_KEY: ${{ secrets.JENKINS_AUTH_KEY }}
                   url: ${{ env.url }}
                   service_name: ${{ env.service_name }}
-                  trigger_path: "run_terraform"
-                  poll_path: "poll_terraform_job_status"
+                  job_type: "runTerraform"
 
     build_and_push_container:
         name: Build and Push Container to ECR
@@ -70,5 +73,4 @@ jobs:
                   JENKINS_AUTH_KEY: ${{ secrets.JENKINS_AUTH_KEY }}
                   url: ${{ env.url }}
                   service_name: ${{ env.service_name }}
-                  trigger_path: "deploy_container"
-                  poll_path: "poll_deploy_job_status"
+                  job_type: "deployContainer"
