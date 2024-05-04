@@ -9,7 +9,7 @@ name: Deploy to ECR
 on:
     push:
         branches:
-            - "master"
+            - "main"
 
 env:
     service_name: real-estate
