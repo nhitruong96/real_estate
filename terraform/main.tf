@@ -30,3 +30,14 @@ provider "aws" {
   access_key = try(data.vault_generic_secret.aws_creds.data["access_key"], null)
   secret_key = try(data.vault_generic_secret.aws_creds.data["secret_key"], null)
 }
+
+# https://docs.aws.amazon.com/acm/latest/userguide/acm-services.html
+# Note: To use an ACM certificate with CloudFront, you must request
+# or import the certificate in the US East (N. Virginia) region.
+# What...the....fudge...WHY?!
+provider "aws" { # This to upload the certificate to the ACM
+  alias  = "useast1"
+  region = "us-east-1"
+  access_key = try(data.vault_generic_secret.aws_creds.data["access_key"], null)
+  secret_key = try(data.vault_generic_secret.aws_creds.data["secret_key"], null)
+}
