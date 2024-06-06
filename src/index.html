@@ -113,7 +113,6 @@
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 448 512"
                         >
-                            <!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
                             <path
                                 fill="currentColor"
                                 d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"
@@ -174,13 +173,6 @@
 
                 <!-- Navigation -->
                 <ul id="mobile-nav"></ul>
-                <script>
-                    const pcNav = document.querySelector("#pc-nav");
-                    const mobileNav = document.querySelector("#mobile-nav");
-
-                    //Copy from PC nav -> Mobile nav
-                    mobileNav.innerHTML = pcNav.innerHTML;
-                </script>
             </div>
         </header>
 
@@ -195,9 +187,9 @@
                             Discover a place you'll love to live.
                         </h1>
                         <p class="desc">
-                            Get the best real estate haunted house deals first,
-                            before they hit the mass market! HOT FORECLOSURE
-                            DEALS with one simple search.
+                            Get the best real estate deals first, before they
+                            hit the mass market! HOT FORECLOSURE DEALS with one
+                            simple search.
                         </p>
                         <!-- Call to action -->
                         <a href="#!" class="btn hero-cta">More About Us</a>
@@ -231,7 +223,9 @@
                         <p class="desc">
                             More than 45,000+ companies trust besnik
                         </p>
-                        <p class="desc">5 Star Ratings (2k+ Review)</p>
+                        <p class="desc hide-on-mobile">
+                            5 Star Ratings (2k+ Review)
+                        </p>
                     </div>
                     <div class="images">
                         <a href="#!">
@@ -368,9 +362,9 @@
                             </a>
                             <div class="body">
                                 <h3 class="title">
-                                    <a href="#!" class="line-clamp"
-                                        >Nikko Apartments</a
-                                    >
+                                    <a href="#!" class="line-clamp">
+                                        Nikko Apartments
+                                    </a>
                                 </h3>
                                 <p
                                     class="desc line-clamp"
@@ -414,9 +408,14 @@
                             </a>
                             <div class="body">
                                 <h3 class="title">
-                                    <a href="#!">CouCou Homestead</a>
+                                    <a href="#!" class="line-clamp">
+                                        CouCou Homestead
+                                    </a>
                                 </h3>
-                                <p class="desc">
+                                <p
+                                    class="desc line-clamp"
+                                    style="--line-clamp: 3"
+                                >
                                     8502 Preston Rd. Inglewood, Maine 98280
                                 </p>
                                 <div class="info">
@@ -455,9 +454,14 @@
                             </a>
                             <div class="body">
                                 <h3 class="title">
-                                    <a href="#!">Lavis 18 Residence</a>
+                                    <a href="#!" class="line-clamp">
+                                        Lavis 18 Residence
+                                    </a>
                                 </h3>
-                                <p class="desc">
+                                <p
+                                    class="desc line-clamp"
+                                    style="--line-clamp: 3"
+                                >
                                     8502 Preston Rd. Inglewood, Maine 98280
                                 </p>
                                 <div class="info">
@@ -484,6 +488,10 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="view-all show-on-mobile">
+                        <a href="#!" class="btn">View All Properties</a>
                     </div>
                 </div>
             </div>
@@ -774,5 +782,13 @@
                 </div>
             </div>
         </footer>
+
+        <script>
+            const pcNav = document.querySelector("#pc-nav");
+            const mobileNav = document.querySelector("#mobile-nav");
+
+            //Copy from PC nav -> Mobile nav
+            mobileNav.innerHTML = pcNav.innerHTML;
+        </script>
     </body>
 </html>
