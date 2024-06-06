@@ -262,3 +262,18 @@
         row-gap: 24px;
     }
 }
+
+/* Small mobile device */
+@media screen and (max-width: 575.98px) {
+    .content {
+        max-width: calc(100% - 34px);
+    }
+
+    .guides .desc {
+        font-size: 1.5rem;
+    }
+
+    .featured .sub-title {
+        font-size: 3.4rem;
+    }
+}
