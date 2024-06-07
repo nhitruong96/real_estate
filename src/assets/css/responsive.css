@@ -263,17 +263,29 @@
     }
 }
 
-/* Small mobile device */
+/* Smallest mobile device */
 @media screen and (max-width: 575.98px) {
     .content {
         max-width: calc(100% - 34px);
     }
 
-    .guides .desc {
-        font-size: 1.5rem;
+    .hero-wrap .title {
+        font-size: 4.9rem;
     }
 
     .featured .sub-title {
-        font-size: 3.4rem;
+        font-size: 3.2rem;
+    }
+
+    .featured .item .desc {
+        font-size: 1.3rem;
+    }
+
+    .featured .item .label {
+        font-size: 1.2rem;
+    }
+
+    .subscription .sub-title {
+        font-size: 3.3rem;
     }
 }
