@@ -67,7 +67,9 @@ resource "aws_iam_role_policy" "github_actions_real-estate_policy" {
                 "iam:DeleteRole",
                 "iam:GetRolePolicy",
                 "iam:PutRolePolicy",
-                "iam:DeleteRolePolicy"
+                "iam:DeleteRolePolicy",
+                "iam:ListRolePolicies",
+                "iam:ListAttachedRolePolicies"
             ],
             "Resource": "arn:aws:iam::975050308029:role/github_actions_real-estate"
         },
