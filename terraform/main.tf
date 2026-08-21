@@ -20,6 +20,12 @@ variable "levantine_io_hosted_zone_id" {}
 provider "vault" {
   address = var.vault_address
   token   = var.vault_token
+  # The provider's default behavior mints a short-lived child token per
+  # run (for automatic revocation) via auth/token/create -- a capability
+  # the CI VAULT_TOKEN secret's policy doesn't grant. Not needed here
+  # anyway: this token is already scoped and rotated at the Vault side,
+  # and the run is fully ephemeral.
+  skip_child_token = true
 }
 
 # Auth for the default (non-delegate) AWS provider is via GitHub Actions
