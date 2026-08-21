@@ -1,43 +1,39 @@
+terraform {
+  backend "s3" {
+    bucket       = "prod-levantine-terraform-bucket"
+    key          = "real_estate/terraform.tfstate"
+    region       = "us-west-2"
+    use_lockfile = true
+  }
+}
+
 variable "region" {}
 variable "environment" {}
 variable "vault_address" {}
 variable "vault_token" {}
-variable "nhitruong_com_hosted_zone_id" {}
+variable "levantine_io_hosted_zone_id" {}
 
-# NOTE: For some reason the IDE wants me to define the access keys for each of the modules.
-# So for now I'll put them in there though I'd prefer they'd use the global ones.
-
-# NOTE: The AWS credentials are not stored in vault here because these terraform templates are
-# running outside of AWS. While I could do a STS-Assume Role, it's pointless since I'll need
-# to provision and store credentials for the user/role that's doing the assuming. That being said,
-# the keys generated when the users are created are stored and retrieved from vault.
-
+# Still needed here: the aws.delegate provider in
+# route_53_delegate_records.tf manages this service's live subdomain
+# record and genuinely needs Vault for its credentials. Only the
+# *default* AWS provider below moves to OIDC.
 provider "vault" {
   address = var.vault_address
   token   = var.vault_token
 }
 
-data "vault_generic_secret" "aws_creds" {
-  path = "kv/aws/iam_access_keys/terraform_real-estate"
-}
-
+# Auth for the default (non-delegate) AWS provider is via GitHub Actions
+# OIDC role assumption (see iam_oidc_role.tf), not a long-lived
+# Vault-stored static key. aws-actions/configure-aws-credentials sets
+# AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY/AWS_SESSION_TOKEN as env vars
+# before terraform runs, which the AWS provider's default credential
+# chain picks up automatically -- nothing to configure here.
 provider "aws" {
-  # This is the default account, don't specify an alias to use the default
   region = var.region
-  # Secret and Access Keys from Vault
-  # NOTE: If the keys are not available in vault, the values are gonna be 'null' and the module will fail
-  # The keys could have been deleted by a destroy operation.
-  access_key = try(data.vault_generic_secret.aws_creds.data["access_key"], null)
-  secret_key = try(data.vault_generic_secret.aws_creds.data["secret_key"], null)
 }
 
-# https://docs.aws.amazon.com/acm/latest/userguide/acm-services.html
-# Note: To use an ACM certificate with CloudFront, you must request
-# or import the certificate in the US East (N. Virginia) region.
-# What...the....fudge...WHY?!
-provider "aws" { # This to upload the certificate to the ACM
-  alias  = "useast1"
-  region = "us-east-1"
-  access_key = try(data.vault_generic_secret.aws_creds.data["access_key"], null)
-  secret_key = try(data.vault_generic_secret.aws_creds.data["secret_key"], null)
-}
+# NOTE: 2026-08-21 -- the aws.useast1 provider alias (for an ACM cert, per
+# the comment that used to be here) was declared but only ever referenced
+# by the fully-commented-out CloudFront experiment in s3_hosting.tf.
+# Dropped as dead weight; add it back properly (with its own OIDC-based
+# auth) if that experiment is ever revived for real.

@@ -18,20 +18,36 @@ env:
 jobs:
     run_terraform:
         name: Apply Terraform Templates
-        runs-on: ubuntu-latest
+        # self-hosted, not ubuntu-latest: this repo's terraform reaches
+        # Vault directly for the delegate-zone record's credentials --
+        # not reachable from a GitHub-hosted runner, only from inside the
+        # homelab network.
+        runs-on: self-hosted
+        permissions:
+            id-token: write
+            contents: read
         steps:
             - name: Check out code
               uses: actions/checkout@v4
-              with:
-                  repository: "Levantine-1/thisper" # This is where the run_jenkins_job.sh script is located
 
-            - name: Refresh Terraform
-              run: /bin/bash .github/scripts/run_jenkins_job.sh
+            - name: Configure AWS credentials via OIDC
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  role-to-assume: arn:aws:iam::975050308029:role/github_actions_real-estate
+                  aws-region: us-west-2
+
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v3
+
+            - name: Terraform Init
+              run: terraform init
+              working-directory: terraform
+
+            - name: Terraform Apply
+              run: terraform apply -auto-approve -var-file=vars/production.tfvars -var "vault_token=${VAULT_TOKEN}"
+              working-directory: terraform
               env:
-                  JENKINS_AUTH_KEY: ${{ secrets.JENKINS_AUTH_KEY }}
-                  url: ${{ env.url }}
-                  service_name: ${{ env.service_name }}
-                  job_type: "runTerraform"
+                  VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
 
     build_and_push_container:
         name: Build and Push Container to ECR

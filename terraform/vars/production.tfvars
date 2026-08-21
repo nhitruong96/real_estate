@@ -9,4 +9,4 @@ vault_address = "http://vault.internal.levantine.io:8200"
 vault_token = "<token>"
 
 # Hosted zone IDs of the root account for subdomain delegation for this account
-nhitruong_com_hosted_zone_id = "Z2QFXIQOJMZTAV"
+levantine_io_hosted_zone_id = "Z32CDTOFAQVLJJ"
