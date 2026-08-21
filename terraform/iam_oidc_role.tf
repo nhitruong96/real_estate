@@ -1,11 +1,13 @@
 # GitHub Actions assumes this role via OIDC (short-lived federated tokens)
 # instead of a long-lived static IAM user key. The OIDC provider itself is
 # account-wide and created once in the core terraform repo
-# (iam/oidc/github_oidc_provider.tf) -- referenced here via a data source,
-# never created per-repo (a second provider for the same issuer URL would
-# collide).
-data "aws_iam_openid_connect_provider" "github" {
-  arn = "arn:aws:iam::975050308029:oidc-provider/token.actions.githubusercontent.com"
+# (iam/oidc/github_oidc_provider.tf) -- referenced here by its known ARN
+# directly (not a data source: reading it back via IAM would need an
+# iam:GetOpenIDConnectProvider grant this role has no other use for, just
+# to echo back the same ARN we already have). Never created per-repo (a
+# second provider for the same issuer URL would collide).
+locals {
+  github_oidc_provider_arn = "arn:aws:iam::975050308029:oidc-provider/token.actions.githubusercontent.com"
 }
 
 data "aws_iam_policy_document" "github_actions_assume_role" {
@@ -15,7 +17,7 @@ data "aws_iam_policy_document" "github_actions_assume_role" {
 
     principals {
       type        = "Federated"
-      identifiers = [data.aws_iam_openid_connect_provider.github.arn]
+      identifiers = [local.github_oidc_provider_arn]
     }
 
     condition {
