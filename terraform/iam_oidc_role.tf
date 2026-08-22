@@ -32,9 +32,26 @@ data "aws_iam_policy_document" "github_actions_assume_role" {
     # the ECR repo/DNS name is "real-estate" (hyphen) -- these are two
     # different identifiers for the same service.
     condition {
-      test     = "StringEquals"
+      # Two values because GitHub is migrating the `sub` claim to an
+      # "immutable" form that embeds numeric owner and repo IDs, e.g.
+      #   repo:nhitruong96@71067517/real_estate@1342417979:ref:refs/heads/main
+      # instead of the classic
+      #   repo:nhitruong96/real_estate:ref:refs/heads/main
+      # A StringEquals against only the classic form silently stops
+      # matching once a repo is switched over, and it surfaces as a flat
+      # "Not authorized to perform sts:AssumeRoleWithWebIdentity" with no
+      # hint that the claim shape is what changed. Found live on livecam;
+      # every repo in this account shares the pattern, so all were fixed
+      # together rather than one failed deploy at a time.
+      #
+      # Still pinned to this exact owner and repo -- the wildcards cover
+      # only the numeric IDs, anchored after "nhitruong96@" and "/real_estate@".
+      test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:nhitruong96/real_estate:ref:refs/heads/main"]
+      values = [
+        "repo:nhitruong96/real_estate:ref:refs/heads/main",
+        "repo:nhitruong96@*/real_estate@*:ref:refs/heads/main",
+      ]
     }
   }
 }
